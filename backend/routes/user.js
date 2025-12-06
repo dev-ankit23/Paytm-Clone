@@ -2,7 +2,7 @@ import express from "express";
 import userModel from "../db.js";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt, { hash } from "bcrypt";
 
 const saltRounds = 10;
 
@@ -40,11 +40,12 @@ userRouter.post("/signup", async (req, res) => {
         message: "Email already taken",
       });
     }
+    const hashedpassword = await bcrypt.hash(req.body.password, saltRounds);
 
     const newUser = await userModel.create({
       username: req.body.username,
       email: req.body.email,
-      password: req.body.password,
+      password: hashedpassword,
     });
 
     const userId = newUser._id;
@@ -73,13 +74,20 @@ userRouter.post("/signin", async (req, res) => {
         errors: error.errors,
       });
     }
-
     const user = await userModel.findOne({
       email: req.body.email,
-      password: req.body.password,
     });
 
     if (!user) {
+      return res.status(411).json({
+        message: "Invalid credentials",
+      });
+    }
+    const verifiedpassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (!verifiedpassword) {
       return res.status(411).json({
         message: "Invalid credentials",
       });
