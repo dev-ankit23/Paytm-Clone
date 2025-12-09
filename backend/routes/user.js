@@ -1,9 +1,9 @@
 import express from "express";
-import userModel from "../db.js";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import authMiddleware from "../middelware.js";
+import { userModel } from "../db.js";
 
 const saltRounds = 10;
 
@@ -25,6 +25,7 @@ const updateUserSchema = z.object({
   email: z.string().email().optional(),
   password: z.string().min(6).optional(),
 });
+
 userRouter.post("/signup", async (req, res) => {
   try {
     const { success, error } = signupBody.safeParse(req.body);
@@ -53,8 +54,12 @@ userRouter.post("/signup", async (req, res) => {
       password: hashedpassword,
     });
 
-    const userId = newUser._id;
+    // const account = new accountsModel({
+    //   userid: userId,
+    //   balance: Math.random * 1000,
+    // });
 
+    const userId = newUser._id;
     const token = jwt.sign({ userId }, JWT_SECRET);
 
     res.json({
