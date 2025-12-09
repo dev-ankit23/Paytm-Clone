@@ -2,7 +2,8 @@ import express from "express";
 import userModel from "../db.js";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
+import authMiddleware from "../middelware.js";
 
 const saltRounds = 10;
 
@@ -19,7 +20,11 @@ const signinBody = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
-
+const updateUserSchema = z.object({
+  username: z.string().min(3).max(30).optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(6).optional(),
+});
 userRouter.post("/signup", async (req, res) => {
   try {
     const { success, error } = signupBody.safeParse(req.body);
@@ -104,6 +109,45 @@ userRouter.post("/signin", async (req, res) => {
     res.status(500).json({
       message: "Internal server error",
     });
+  }
+});
+
+userRouter.put("/update", authMiddleware, async (req, res) => {
+  try {
+    // Validate input
+    const parsed = updateUserSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(411).json({
+        message: "Incorrect inputs",
+        errors: parsed.error.errors,
+      });
+    }
+
+    let dataToUpdate = parsed.data;
+
+    // If password is sent → hash it
+    if (dataToUpdate.password) {
+      dataToUpdate.password = await bcrypt.hash(
+        dataToUpdate.password,
+        saltRounds
+      );
+    }
+
+    // Update user
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.userId,
+      dataToUpdate,
+      { new: true } // return updated user
+    );
+
+    res.json({
+      message: "Updated successfully",
+      updatedUser,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
