@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { object } from "zod";
 
 // Connect to MongoDB
 mongoose
@@ -31,7 +32,19 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+const accountsSchema = new mongoose.Schema({
+  userid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: userSchema,
+    required: true,
+  },
+  balance: {
+    type: Number,
+    required: true,
+  },
+});
 // Create and export User model
 const userModel = mongoose.model("User", userSchema);
+const accountsModel = mongoose.model("Accounts", accountsSchema);
 
-export default userModel;
+export { userModel, accountsModel };
