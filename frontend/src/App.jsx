@@ -1,11 +1,16 @@
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
 function App() {
-
   return (
-    <div>
-        Hello world
-    </div>
-  )
+    <>
+      <div>
+        <p className="read-the-docs">Hello ankit backend done</p>
+      </div>
+    </>
+  );
 }
 
-export default App
+export default App;
