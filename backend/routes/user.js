@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import authMiddleware from "../middelware.js";
 import { userModel } from "../db.js";
 
+import { accountsModel } from "../db.js";
+
 const saltRounds = 10;
 
 const userRouter = express.Router();
@@ -54,12 +56,12 @@ userRouter.post("/signup", async (req, res) => {
       password: hashedpassword,
     });
 
-    // const account = new accountsModel({
-    //   userid: userId,
-    //   balance: Math.random * 1000,
-    // });
-
     const userId = newUser._id;
+
+    await accountsModel.create({
+      userId: userId,
+      balance: 1 + Math.random() * 1000,
+    });
     const token = jwt.sign({ userId }, JWT_SECRET);
 
     res.json({
@@ -175,4 +177,5 @@ userRouter.get("/bulk", async (req, res) => {
     })),
   });
 });
+
 export default userRouter;
