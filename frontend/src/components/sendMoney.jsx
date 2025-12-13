@@ -1,7 +1,7 @@
 import React from "react";
 
-function sendMoney() {
+function SendMoney() {
   return <div>sendMoney</div>;
 }
 
-export default sendMoney;
+export default SendMoney;
