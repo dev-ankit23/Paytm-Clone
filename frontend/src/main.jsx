@@ -1,10 +1,11 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./App";
-import { Signup } from "./components/signup";
-import Signin from "./components/signin";
-import Dashboard from "./components/dashboard";
-import SendMoney from "./components/sendMoney";
+import Signup from "./Signup";
+import { Dashboard } from "./Dashboard";
+import SendMoney from "./SendMoney";
+
+import Signin from "./Signin";
 
 const root = document.getElementById("root");
 
